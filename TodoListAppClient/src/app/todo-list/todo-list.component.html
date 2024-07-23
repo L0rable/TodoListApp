@@ -1,1 +1,19 @@
-<p>todo-list works!</p>
+<div class="main">
+    <h1>TODO List Application</h1>
+
+    <input
+        #newTodoItem
+        placeholder="Add an todo item"
+        (keyup.enter)="addTodoItem(newTodoItem.value); newTodoItem.value = ''"
+        class="lg-text-input"
+        id="addTodoItemInput"
+    />
+    <button class="btn-primary" (click)="addTodoItem(newTodoItem.value)">Add</button>
+      
+    <ul>
+        <li *ngFor="let item of todoItems">
+            <hr>
+            <!-- <app-todo-item (remove)="deleteTodoItem(item)" [item]="item"></app-todo-item> -->
+        </li>
+    </ul>
+</div>
