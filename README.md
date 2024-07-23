@@ -11,3 +11,8 @@ Backend
 1. cd TodoListAppBackend/TodoListApi/
 2. dotnet build
 3. dotnet run
+
+## Testing
+Only done integration testing for the Api Controller
+1. cd TodoListAppBackend/TodoListApi.Tests
+2. dotnet test
