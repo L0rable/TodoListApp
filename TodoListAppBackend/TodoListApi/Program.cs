@@ -1,44 +1,59 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.EntityFrameworkCore;
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<TodoItemDbContext>(opt => opt.UseInMemoryDatabase("TodoItemList"));
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+// builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddControllers();
+builder.Services.AddOpenApiDocument(config =>
+{
+    config.DocumentName = "TodoItemsAPI";
+    config.Title = "TodoItemsAPI v1";
+    config.Version = "v1";
+});
+
+// All Cross-Origin Resource Sharing
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("AllowLocalhost",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:4200")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseCors("AllowLocalhost");
+
+// Populate the In-memory db
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var services = scope.ServiceProvider;
+    using (var context = new TodoItemDbContext(
+        services.GetRequiredService<DbContextOptions<TodoItemDbContext>>()))
+    {
+
+        // Look for any TodoItems.
+        if (context.TodoItems.Any())
+        {
+            return;
+        }
+
+        context.TodoItems.AddRange(
+            new TodoItem { Name = "Task 1" },
+            new TodoItem { Name = "Task 2" },
+            new TodoItem { Name = "Task 3" }
+        );
+        context.SaveChanges();
+    }
 }
 
-app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+// Configure the HTTP request pipeline.
+app.UseRouting();
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
