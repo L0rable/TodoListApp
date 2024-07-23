@@ -1,0 +1,26 @@
+.item {
+    font-size: 1.2rem;
+}
+
+.name {
+    align-self: center;
+}
+  
+.btn {
+    flex-basis: 49%;
+}
+
+.btn-warn {
+    background-color: #b90000;
+    color: #fff;
+    border-color: #9a0000;
+}
+
+.btn-warn:hover {
+    background-color: #9a0000;
+}
+
+.btn-warn:active {
+    background-color: #e30000;
+    border-color: #000;
+}

@@ -1,1 +1,6 @@
-<p>todo-item works!</p>
+<div class="item">
+    <div class="btn-wrapper">
+        <label class="name" [for]="item.name">{{ item.name }}</label>
+        <button class="btn btn-warn" (click)="remove.emit()">Delete</button>
+    </div>
+</div>
